@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Matteprovet – Övningsbank</title>
+<meta name="theme-color" content="#f4f6fb">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<style>
+  :root{
+    --bg:#f4f6fb; --card:#ffffff; --ink:#1b2033; --muted:#6b7390; --line:#e4e8f2;
+    --accent:#4f46e5; --accent-soft:#eef0ff; --accent-ink:#ffffff;
+    --good:#15803d; --good-bg:#ecfdf3; --good-line:#86d9a8;
+    --bad:#c62828; --bad-bg:#fef2f2; --bad-line:#f3a6a6;
+    --shadow:0 1px 2px rgba(27,32,51,.05),0 8px 24px rgba(27,32,51,.06);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0}
+  body{
+    background:radial-gradient(1200px 500px at 50% -200px,#e6e9ff 0%,transparent 70%),var(--bg);
+    color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.5; min-height:100vh;
+  }
+  .wrap{max-width:680px;margin:0 auto;padding:16px 16px calc(24px + env(safe-area-inset-bottom))}
+  .brand{display:flex;align-items:center;gap:10px;margin:6px 0 16px}
+  .logo{width:36px;height:36px;border-radius:11px;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:700;font-size:19px;box-shadow:0 4px 12px rgba(79,70,229,.35)}
+  .brand b{font-size:17px;letter-spacing:-.01em}
+  .brand span{color:var(--muted);font-size:13px;display:block;margin-top:-2px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);padding:20px}
+  h1{font-size:26px;line-height:1.2;margin:0 0 8px;letter-spacing:-.02em}
+  p.lead{color:var(--muted);margin:0 0 18px}
+  .label{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:18px 0 8px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{
+    border:1px solid var(--line);background:#fff;color:var(--ink);padding:8px 13px;border-radius:999px;
+    font:inherit;font-size:14px;cursor:pointer;transition:.15s;
+  }
+  .chip small{color:var(--muted);margin-left:4px}
+  .chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+  .chip.on small{color:#dcd9ff}
+  .toggle{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border:1px solid var(--line);border-radius:14px;margin-top:16px;cursor:pointer;user-select:none}
+  .toggle .t b{display:block;font-size:15px}
+  .toggle .t span{font-size:13px;color:var(--muted)}
+  .sw{width:46px;height:28px;border-radius:999px;background:#cfd5e6;position:relative;flex:none;transition:.2s}
+  .sw::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:.2s}
+  .toggle.on .sw{background:var(--accent)}
+  .toggle.on .sw::after{left:21px}
+  .btn{
+    display:block;width:100%;border:0;border-radius:14px;padding:15px 18px;font:inherit;font-weight:700;font-size:16px;
+    background:var(--accent);color:var(--accent-ink);cursor:pointer;box-shadow:0 6px 16px rgba(79,70,229,.3);transition:.15s;
+  }
+  .btn:active{transform:translateY(1px)}
+  .btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line);box-shadow:none}
+  .btn+.btn{margin-top:10px}
+  .best{margin-top:14px;text-align:center;color:var(--muted);font-size:14px}
+
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px;font-size:14px;color:var(--muted)}
+  .topbar b{color:var(--ink)}
+  .pill{background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-weight:600;color:var(--ink)}
+  .bar{height:8px;background:#e1e5f3;border-radius:999px;overflow:hidden;margin-bottom:14px}
+  .bar i{display:block;height:100%;background:linear-gradient(90deg,#6366f1,#4f46e5);border-radius:999px;transition:width .3s}
+  .tag{display:inline-block;background:var(--accent-soft);color:var(--accent);font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;margin-bottom:12px}
+  .q{font-size:18px;line-height:1.65;margin:0 0 16px;font-weight:500}
+  .opts{display:grid;gap:10px}
+  .opt{
+    display:flex;align-items:center;gap:12px;text-align:left;width:100%;
+    background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;min-height:56px;
+    font:inherit;font-size:17px;color:var(--ink);cursor:pointer;transition:.12s;
+  }
+  .opt:hover:not(:disabled){border-color:#b9bff5;background:#fafaff}
+  .opt .k{
+    flex:none;width:30px;height:30px;border-radius:50%;background:var(--accent-soft);color:var(--accent);
+    display:grid;place-items:center;font-weight:700;font-size:14px
+  }
+  .opt .txt{flex:1}
+  .opt .mark{flex:none;font-weight:800;font-size:18px}
+  .opt:disabled{cursor:default}
+  .opt.good{background:var(--good-bg);border-color:var(--good-line)}
+  .opt.good .k{background:var(--good);color:#fff}
+  .opt.good .mark{color:var(--good)}
+  .opt.bad{background:var(--bad-bg);border-color:var(--bad-line)}
+  .opt.bad .k{background:var(--bad);color:#fff}
+  .opt.bad .mark{color:var(--bad)}
+  .opt.dim{opacity:.55}
+  .fb{margin-top:16px;border-radius:14px;padding:14px 16px;border:1px solid}
+  .fb.good{background:var(--good-bg);border-color:var(--good-line)}
+  .fb.bad{background:var(--bad-bg);border-color:var(--bad-line)}
+  .fb h3{margin:0 0 4px;font-size:16px}
+  .fb.good h3{color:var(--good)} .fb.bad h3{color:var(--bad)}
+  .fb p{margin:0;font-size:15px}
+  .next{position:sticky;bottom:calc(10px + env(safe-area-inset-bottom));margin-top:16px}
+
+  .score-ring{
+    width:150px;height:150px;border-radius:50%;margin:6px auto 14px;display:grid;place-items:center;
+    background:conic-gradient(var(--accent) calc(var(--p)*1%),#e4e8f4 0);
+  }
+  .score-ring div{width:118px;height:118px;border-radius:50%;background:#fff;display:grid;place-items:center;text-align:center}
+  .score-ring b{font-size:32px;line-height:1;letter-spacing:-.02em}
+  .score-ring span{font-size:13px;color:var(--muted);display:block;margin-top:2px}
+  .center{text-align:center}
+  details{border:1px solid var(--line);border-radius:14px;padding:10px 14px;margin-top:10px;background:#fff}
+  summary{cursor:pointer;font-weight:600;font-size:15px}
+  details .ans{margin-top:8px;font-size:15px}
+  details .ans b{color:var(--good)}
+  .foot{text-align:center;color:var(--muted);font-size:12px;margin-top:18px}
+  .fig{margin:0 0 18px;text-align:center}
+  .fig svg{width:100%;max-width:340px;height:auto;display:block;margin:0 auto;background:#fafbff;border:1px solid var(--line);border-radius:14px;padding:6px}
+  .fig small{display:block;color:var(--muted);font-size:12px;margin-top:6px}
+  details .fig{margin:10px 0 0}
+  .katex{font-size:1.08em}
+  @media (min-width:640px){ .wrap{padding-top:32px} .card{padding:28px} .q{font-size:20px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand"><div class="logo">∑</div><div><b>Matteprovet</b><span>Övningsbank · Del A</span></div></div>
+  <div id="app"></div>
+  <div class="foot">100 egna uppgifter i provets stil · inga hjälpmedel</div>
+</div>
+
+<script>
+const r = String.raw;
+// o = tre alternativ (slumpas), d = "Inget av (a)–(c)" ligger alltid sist.
+// a = index (0–2) för rätt alternativ, eller -1 om "Inget av (a)–(c)" är rätt.
+const Q = [
+/* ---------- ALGEBRA ---------- */
+{c:'Algebra', q:r`Om $a=\sqrt2$, $b=\dfrac{1}{\sqrt2}$ och $x=(a+b)^2-(a-b)^2$, så gäller att`,
+ o:[r`$x=2$`, r`$x=4$`, r`$x=2\sqrt2$`], a:1,
+ e:r`$(a+b)^2-(a-b)^2=4ab=4\cdot\sqrt2\cdot\frac1{\sqrt2}=4$.`},
+{c:'Algebra', q:r`Om $-1<a<3$ och $x=\sqrt{a^2-6a+9}+\sqrt{a^2+2a+1}$, så är $x$ lika med`,
+ o:[r`$2a-2$`, r`$2a+4$`, r`$a+1$`], a:-1,
+ e:r`Uttrycket är $|a-3|+|a+1|$. För $-1<a<3$ blir det $(3-a)+(a+1)=4$, en konstant.`},
+{c:'Algebra', q:r`Om $3^{x}\cdot 9^{x-1}=27$, så gäller att`,
+ o:[r`$x=1$`, r`$x=2$`, r`$x=3$`], a:-1,
+ e:r`$3^{x}\cdot3^{2x-2}=3^{3x-2}=3^3\Rightarrow 3x-2=3\Rightarrow x=\tfrac53$.`},
+{c:'Algebra', q:r`För alla reella tal $a$ gäller att`,
+ o:[r`$\sqrt{a^2}=a$`, r`$(\sqrt a)^2=a$`, r`$\sqrt{a^4}=a^2$`], a:2,
+ e:r`$\sqrt{a^2}=|a|$, och $(\sqrt a)^2$ är inte ens definierat för $a<0$. Men $a^4=(a^2)^2$ med $a^2\ge0$, så $\sqrt{a^4}=a^2$ alltid.`},
+{c:'Algebra', q:r`För positiva reella tal $a$ och $b$ är $\dfrac{\frac1a-\frac1b}{\frac1a+\frac1b}$ lika med`,
+ o:[r`$\dfrac{b-a}{a+b}$`, r`$\dfrac{a-b}{a+b}$`, r`$\dfrac{a-b}{ab}$`], a:0,
+ e:r`Förläng med $ab$: täljaren blir $b-a$ och nämnaren $b+a$.`},
+{c:'Algebra', q:r`Om $a$ och $b$ är reella tal sådana att $a<b<0$, så gäller att`,
+ o:[r`$a^2<b^2$`, r`$\dfrac1a<\dfrac1b$`, r`$|a|<|b|$`], a:-1,
+ e:r`Testa $a=-3,\ b=-2$: $a^2=9>4=b^2$, $\frac1a=-\frac13>-\frac12=\frac1b$ och $|a|=3>2=|b|$. Alla tre är falska.`},
+{c:'Algebra', q:r`Antalet reella lösningar till ekvationen $\sqrt{x+2}=x$ är`,
+ o:[r`$0$`, r`$1$`, r`$2$`], a:1,
+ e:r`Kvadrering ger $x^2-x-2=0$, dvs. $x=2$ eller $x=-1$. Men $x=-1$ ger $\sqrt1=1\ne-1$ (falsk rot). Endast $x=2$ duger.`},
+
+/* ---------- EKVATIONER & OLIKHETER ---------- */
+{c:'Ekvationer & olikheter', q:r`Ekvationen $x^2+2ax+4=0$ ($a$ reellt) har två olika reella lösningar. Man kan då dra slutsatsen att`,
+ o:[r`$a>2$`, r`$a<-2$ eller $a>2$`, r`$-2<a<2$`], a:1,
+ e:r`Diskriminanten: $4a^2-16>0\iff a^2>4\iff |a|>2$. Alternativ (a) missar fallet $a<-2$.`},
+{c:'Ekvationer & olikheter', q:r`Ekvationen $x^2+bx+9=0$ har exakt en reell lösning. Man kan då dra slutsatsen att`,
+ o:[r`$b=6$`, r`$b=-6$`, r`$b^2=36$`], a:2,
+ e:r`Dubbelrot kräver $b^2-36=0$, dvs. $b=\pm6$. Båda tecknen är möjliga, så bara $b^2=36$ gäller säkert.`},
+{c:'Ekvationer & olikheter', q:r`Ekvationen $x^2-5x+c=0$ har två olika positiva lösningar. Vilket av följande kan då <u>inte</u> gälla?`,
+ o:[r`$c<0$`, r`$c=6$`, r`$c=1$`], a:0,
+ e:r`Produkten av rötterna är $c$ och måste vara positiv, så $c<0$ är omöjligt. ($c=6$ ger rötterna $2$ och $3$.)`},
+{c:'Ekvationer & olikheter', q:r`Olikheten $|x-1|>|x+3|$ är uppfylld för`,
+ o:[r`alla $x<-1$`, r`alla $x>-1$`, r`alla reella $x$`], a:0,
+ e:r`Villkoret säger att $x$ ligger närmare $-3$ än $1$. Mittpunkten är $-1$, så det gäller för $x<-1$.`},
+{c:'Ekvationer & olikheter', q:r`Olikheten $\dfrac1x<1$ är uppfylld för`,
+ o:[r`$x>1$`, r`$x<1$`, r`$x<0$ eller $x>1$`], a:2,
+ e:r`För $x>0$ ger det $x>1$. För $x<0$ är vänsterledet negativt och olikheten gäller alltid. $x=0$ är inte tillåtet.`},
+{c:'Ekvationer & olikheter', q:r`Antalet heltalslösningar till olikheten $\dfrac{x}{x-2}\le0$ är`,
+ o:[r`$1$`, r`$2$`, r`$3$`], a:1,
+ e:r`Teckenstudium: kvoten är $\le0$ för $0\le x<2$. Heltalen är $0$ och $1$.`},
+{c:'Ekvationer & olikheter', q:r`Ekvationen $x^2-6x+2=0$ har lösningarna $x_1$ och $x_2$. Då är $\dfrac1{x_1}+\dfrac1{x_2}$ lika med`,
+ o:[r`$\dfrac13$`, r`$6$`, r`$\dfrac16$`], a:-1,
+ e:r`$\frac1{x_1}+\frac1{x_2}=\frac{x_1+x_2}{x_1x_2}=\frac62=3$ (Vietas formler).`},
+
+/* ---------- KOMPLEXA TAL & POLYNOM ---------- */
+{c:'Komplexa tal & polynom', q:r`Om $z=1+i$, så är $z^4$ lika med`,
+ o:[r`$4$`, r`$-4$`, r`$4i$`], a:1,
+ e:r`$z^2=1+2i+i^2=2i$, så $z^4=(2i)^2=-4$.`},
+{c:'Komplexa tal & polynom', q:r`För alla komplexa tal $z$ gäller att`,
+ o:[r`$z\cdot\bar z=z^2$`, r`$z\cdot\bar z=|z|^2$`, r`$z\cdot\bar z=|z|$`], a:1,
+ e:r`Med $z=x+iy$ är $z\bar z=x^2+y^2=|z|^2$.`},
+{c:'Komplexa tal & polynom', q:r`Polynomet $P$ uppfyller $P(2)=0$. Man kan då dra slutsatsen att`,
+ o:[r`$x+2$ är en faktor i $P(x)$`, r`$x-2$ är en faktor i $P(x)$`, r`$P(-2)=0$`], a:1,
+ e:r`Faktorsatsen: $P(a)=0\iff (x-a)$ är en faktor i $P(x)$.`},
+
+/* ---------- LOGARITMER & EXPONENTIAL ---------- */
+{c:'Logaritmer & exponential', q:r`För alla positiva reella tal $x$ gäller att`,
+ o:[r`$\ln(x^2)=(\ln x)^2$`, r`$\ln(x^2)=2\ln x$`, r`$\ln\sqrt x=\sqrt{\ln x}$`], a:1,
+ e:r`Potenslagen: $\ln(x^p)=p\ln x$. De andra är falska, t.ex. $x=e$: $\ln(e^2)=2\ne1=(\ln e)^2$.`},
+{c:'Logaritmer & exponential', q:r`För alla reella tal $x$ gäller att`,
+ o:[r`$e^{\ln x}=x$`, r`$\ln(e^{x})=|x|$`, r`$e^{2x}=2e^{x}$`], a:-1,
+ e:r`(a) kräver $x>0$. (b) $\ln(e^x)=x$, inte $|x|$. (c) är falskt, t.ex. $x=0$ ger $1\ne2$. Inget gäller generellt.`},
+{c:'Logaritmer & exponential', q:r`Talet $\log_4 8$ är lika med`,
+ o:[r`$2$`, r`$\dfrac32$`, r`$\dfrac43$`], a:1,
+ e:r`$4^{3/2}=(2^2)^{3/2}=2^3=8$.`},
+{c:'Logaritmer & exponential', q:r`Om $2^x=3$ och $2^y=5$, så är $2^{x+y}$ lika med`,
+ o:[r`$8$`, r`$16$`, r`$30$`], a:-1,
+ e:r`$2^{x+y}=2^x\cdot2^y=3\cdot5=15$.`},
+{c:'Logaritmer & exponential', q:r`Antalet reella lösningar till ekvationen $e^{2x}-3e^x+2=0$ är`,
+ o:[r`$0$`, r`$1$`, r`$2$`], a:2,
+ e:r`Sätt $t=e^x>0$: $t^2-3t+2=0\Rightarrow t=1$ eller $t=2$, dvs. $x=0$ eller $x=\ln2$.`},
+{c:'Logaritmer & exponential', q:r`Funktionen $f(x)=\ln(x^2-4)$ är definierad precis när`,
+ o:[r`$|x|>2$`, r`$x>2$`, r`$|x|<2$`], a:0,
+ e:r`Kravet är $x^2-4>0\iff x<-2$ eller $x>2$.`},
+
+/* ---------- TRIGONOMETRI ---------- */
+{c:'Trigonometri', q:r`För alla reella $x$ gäller att`,
+ o:[r`$\cos\!\left(x+\frac{\pi}{2}\right)=\sin x$`, r`$\cos\!\left(x+\frac{\pi}{2}\right)=-\sin x$`, r`$\cos\!\left(x+\frac{\pi}{2}\right)=\cos x$`], a:1,
+ e:r`Test: $x=0$ ger $\cos\frac\pi2=0$ och $x=\frac\pi2$ ger $\cos\pi=-1=-\sin\frac\pi2$. Alltså $-\sin x$.`},
+{c:'Trigonometri', q:r`Om $\cos\alpha=p$ och $\dfrac\pi2<\alpha<\pi$, så är $\sin\alpha$ lika med`,
+ o:[r`$-\sqrt{1-p^2}$`, r`$\sqrt{1-p^2}$`, r`$\pm\sqrt{1-p^2}$`], a:1,
+ e:r`$\sin^2\alpha=1-p^2$, och i andra kvadranten är $\sin\alpha>0$.`},
+{c:'Trigonometri', q:r`Om $\sin\alpha=p$ och $\dfrac\pi2<\alpha<\pi$, så är $\tan\alpha$ lika med`,
+ o:[r`$\dfrac{p}{\sqrt{1-p^2}}$`, r`$-\dfrac{p}{\sqrt{1-p^2}}$`, r`$\dfrac{\sqrt{1-p^2}}{p}$`], a:1,
+ e:r`I andra kvadranten är $\cos\alpha=-\sqrt{1-p^2}<0$, så $\tan\alpha=\frac{\sin\alpha}{\cos\alpha}=-\frac{p}{\sqrt{1-p^2}}$.`},
+{c:'Trigonometri', q:r`Om $\sin\alpha=\dfrac13$, så är $\cos2\alpha$ lika med`,
+ o:[r`$\dfrac79$`, r`$\dfrac19$`, r`$\dfrac59$`], a:0,
+ e:r`$\cos2\alpha=1-2\sin^2\alpha=1-\frac29=\frac79$.`},
+{c:'Trigonometri', q:r`Antalet lösningar till ekvationen $\sin x\cos x=\dfrac14$ i intervallet $[0,2\pi]$ är`,
+ o:[r`$2$`, r`$4$`, r`$6$`], a:1,
+ e:r`$\sin x\cos x=\frac12\sin2x$, så $\sin2x=\frac12$. Eftersom $2x\in[0,4\pi]$ får vi fyra lösningar ($2x=\frac\pi6,\frac{5\pi}6,\frac{13\pi}6,\frac{17\pi}6$).`},
+{c:'Trigonometri', q:r`Antalet reella lösningar till ekvationen $\sin x+\cos x=2$ är`,
+ o:[r`$0$`, r`$1$`, r`$2$`], a:0,
+ e:r`$\sin x+\cos x=\sqrt2\sin\!\left(x+\frac\pi4\right)\le\sqrt2<2$. Inga lösningar.`},
+{c:'Trigonometri', q:r`Det största värde som $3\sin x+4\cos x$ kan anta är`,
+ o:[r`$7$`, r`$5$`, r`$12$`], a:1,
+ e:r`Uttrycket kan skrivas $5\sin(x+\varphi)$ eftersom $\sqrt{3^2+4^2}=5$. Maxvärdet är alltså $5$ (inte $7$, ty $\sin x$ och $\cos x$ kan inte båda vara $1$).`},
+{c:'Trigonometri', q:r`För alla reella $x$ (där uttrycken är definierade) gäller att`,
+ o:[r`$\sin2x=2\sin x$`, r`$\cos2x=\cos^2x+\sin^2x$`, r`$\tan2x=2\tan x$`], a:-1,
+ e:r`Rätt är $\sin2x=2\sin x\cos x$, $\cos2x=\cos^2x-\sin^2x$ och $\tan2x=\frac{2\tan x}{1-\tan^2x}$. Alternativen stämmer bara för enstaka $x$.`},
+{c:'Trigonometri', q:r`Om $\alpha$ och $\beta$ är två vinklar i samma triangel och $\sin\alpha=\sin\beta$, så gäller att`,
+ o:[r`$\alpha=\beta$`, r`$\alpha+\beta=\pi$`, r`$\alpha=2\beta$`], a:0,
+ e:r`Sinus är lika om $\alpha=\beta$ eller $\alpha=\pi-\beta$. Det senare ger $\alpha+\beta=\pi$ och lämnar $0$ till tredje vinkeln, vilket är omöjligt. Alltså $\alpha=\beta$.`},
+
+/* ---------- GEOMETRI ---------- */
+{c:'Geometri', q:r`En romb har diagonalerna $6$ och $8$ längdenheter. Rombens omkrets är`,
+ o:[r`$10$`, r`$20$`, r`$24$`], a:1,
+ e:r`Diagonalerna delar varandra mitt itu under rät vinkel, så sidan är $\sqrt{3^2+4^2}=5$. Omkrets $=4\cdot5=20$.`},
+{c:'Geometri', q:r`En fyrhörning är en rektangel, givet att`,
+ o:[r`dess diagonaler är lika långa`, r`dess diagonaler delar varandra mitt itu`, r`dess diagonaler är lika långa och delar varandra mitt itu`], a:2,
+ e:r`Lika långa diagonaler räcker inte (likbent trapets), och diagonaler som halverar varandra ger bara ett parallellogram. Båda villkoren tillsammans ger en rektangel.`},
+{c:'Geometri', q:r`Medianen från hörnet $C$ i triangeln $ABC$ delar triangeln i två trianglar som har`,
+ o:[r`lika stora areor`, r`lika stora omkretsar`, r`kongruent form`], a:0,
+ e:r`De två trianglarna har samma höjd (från $C$) och lika långa baser (halva $AB$), alltså lika stor area. Omkretsar och form skiljer sig i allmänhet.`},
+{c:'Geometri', q:r`Sträckan $AB$ är en diameter i en cirkel och punkten $C$ ligger på cirkeln ($C\ne A,B$). Då gäller att`,
+ o:[r`triangeln $ABC$ är likbent`, r`vinkeln vid $C$ är $90^\circ$`, r`$|AC|=|BC|$`], a:1,
+ e:r`Thales sats: vinkeln på en diameter är rät.`},
+{c:'Geometri', q:r`Alla sidor i en triangel görs $3$ gånger så långa. Triangelns area blir då så många gånger så stor:`,
+ o:[r`$3$`, r`$6$`, r`$12$`], a:-1,
+ e:r`Areor skalar med kvadraten på längdskalan: $3^2=9$.`},
+{c:'Geometri', q:r`Två av sidorna i en triangel är $3$ och $4$ längdenheter. Den tredje sidan kan <u>inte</u> vara`,
+ o:[r`$2$`, r`$5$`, r`$7$`], a:2,
+ e:r`Triangelolikheten kräver $1<x<7$. Med $x=7$ blir triangeln degenererad ($3+4=7$).`},
+{c:'Geometri', q:r`En likbent triangel har sidorna $5$, $5$ och $6$. Dess area är`,
+ o:[r`$12$`, r`$15$`, r`$24$`], a:0,
+ e:r`Höjden mot basen $6$ är $\sqrt{5^2-3^2}=4$. Area $=\frac{6\cdot4}{2}=12$.`},
+{c:'Geometri', q:r`I en cirkel är en centralvinkel $80^\circ$. Randvinkeln på samma båge är`,
+ o:[r`$20^\circ$`, r`$80^\circ$`, r`$160^\circ$`], a:-1,
+ e:r`Randvinkeln är hälften av centralvinkeln: $40^\circ$.`},
+{c:'Geometri', q:r`I en triangel med sidorna $3$, $5$ och $7$ är den största vinkeln`,
+ o:[r`$90^\circ$`, r`$120^\circ$`, r`$135^\circ$`], a:1,
+ e:r`Cosinussatsen mot sidan $7$: $49=9+25-30\cos\gamma\Rightarrow\cos\gamma=-\frac12$, dvs. $\gamma=120^\circ$.`},
+{c:'Geometri', q:r`En triangel har sidorna $4$, $5$ och $6$ längdenheter. Triangeln är`,
+ o:[r`rätvinklig`, r`trubbvinklig`, r`spetsvinklig`], a:2,
+ e:r`Jämför kvadraten på längsta sidan med summan av de andra: $6^2=36<4^2+5^2=41$, så alla vinklar är spetsiga.`},
+{c:'Geometri', q:r`En triangel är inskriven i en cirkel med radien $5$, och en av triangelns sidor har längden $5$. Vinkeln mot den sidan`,
+ o:[r`är endast $30^\circ$`, r`är endast $150^\circ$`, r`kan vara antingen $30^\circ$ eller $150^\circ$`], a:2,
+ e:r`Sinussatsen: $\sin A=\frac{a}{2R}=\frac{5}{10}=\frac12$, så $A=30^\circ$ eller $150^\circ$. Båda går att förverkliga (för $150^\circ$ delar de två andra vinklarna på $30^\circ$).`},
+
+/* ---------- TALFÖLJDER & PROCENT ---------- */
+{c:'Talföljder & procent', q:r`En befolkning ökar med $10\,\%$ per år två år i rad. Den totala ökningen under de två åren är`,
+ o:[r`$20\,\%$`, r`$21\,\%$`, r`$22\,\%$`], a:1,
+ e:r`$1{,}1^2=1{,}21$, alltså $21\,\%$.`},
+{c:'Talföljder & procent', q:r`Summan $1+3+5+\dots+19$ (de tio första udda talen) är lika med`,
+ o:[r`$90$`, r`$110$`, r`$121$`], a:-1,
+ e:r`Summan av de $n$ första udda talen är $n^2$, här $10^2=100$.`},
+{c:'Talföljder & procent', q:r`Summan $1+\dfrac13+\dfrac19+\dfrac1{27}+\dots$ (oändligt många termer) är`,
+ o:[r`$\dfrac32$`, r`$2$`, r`oändligt stor`], a:0,
+ e:r`Geometrisk serie med kvot $\frac13$: $\frac{1}{1-\frac13}=\frac32$.`},
+{c:'Talföljder & procent', q:r`En mängd av ett ämne halveras var tredje timme. Efter $9$ timmar återstår`,
+ o:[r`$\dfrac13$`, r`$\dfrac16$`, r`$\dfrac18$`], a:2,
+ e:r`Nio timmar är tre halveringar: $\left(\frac12\right)^3=\frac18$.`},
+{c:'Talföljder & procent', q:r`I en aritmetisk talföljd är $a_3=7$ och $a_7=19$. Differensen är`,
+ o:[r`$2$`, r`$3$`, r`$4$`], a:1,
+ e:r`Fyra steg ger skillnaden $12$, så differensen är $12/4=3$.`},
+{c:'Talföljder & procent', q:r`Talen $2$, $x$ och $18$ bildar (i den ordningen) en geometrisk talföljd. Då gäller att`,
+ o:[r`$x=6$`, r`$x=-6$`, r`$x=6$ eller $x=-6$`], a:2,
+ e:r`Kvoterna ska vara lika: $\frac x2=\frac{18}{x}\Rightarrow x^2=36$, så $x=\pm6$. Båda ger en geometrisk följd (kvot $3$ resp. $-3$).`},
+{c:'Talföljder & procent', q:r`Ett pris höjs med $25\,\%$. Hur många procent måste det nya priset sänkas för att komma tillbaka till det ursprungliga?`,
+ o:[r`$20\,\%$`, r`$25\,\%$`, r`$30\,\%$`], a:0,
+ e:r`Nytt pris $=1{,}25p$. Sänkning med $x$ ger $1{,}25(1-x)=1\Rightarrow 1-x=0{,}8\Rightarrow x=20\,\%$.`}
+];
+</script>
+
+<script>
+/* ================= Del 2: ytterligare 50 uppgifter (några med figurer) ================= */
+const SV=(vb,inner,label)=>`<svg viewBox="${vb}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${label}"><g fill="none" stroke="#1b2033" stroke-width="2" stroke-linejoin="round" stroke-linecap="round">${inner}</g></svg>`;
+const T=(x,y,s,sz)=>`<text x="${x}" y="${y}" text-anchor="middle" font-size="${sz||15}" font-family="system-ui,-apple-system,Segoe UI,sans-serif" fill="#1b2033" stroke="none">${s}</text>`;
+const L=(x1,y1,x2,y2,dash)=>`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"${dash?' stroke-dasharray="5 4" stroke-width="1.6"':''}/>`;
+const PG=(pts)=>`<polygon points="${pts}" fill="#eef0ff"/>`;
+const CI=(cx,cy,r,fill)=>`<circle cx="${cx}" cy="${cy}" r="${r}" fill="${fill||'none'}"/>`;
+const RA=(x,y,ux,uy,vx,vy,s)=>{s=s||10;return `<path d="M${x+ux*s} ${y+uy*s} L${x+(ux+vx)*s} ${y+(uy+vy)*s} L${x+vx*s} ${y+vy*s}" stroke-width="1.5"/>`;};
+const AR=(d)=>`<path d="${d}" stroke-width="1.6"/>`;
+const DOT=(x,y)=>`<circle cx="${x}" cy="${y}" r="2.6" fill="#1b2033" stroke="none"/>`;
+
+const FIG={
+ parallellogram: SV('0 0 260 150',
+   PG('20,120 140,120 209,80 89,80')+AR('M46 120 A26 26 0 0 0 42.5 107')+
+   T(8,132,'A')+T(150,134,'B')+T(218,78,'C')+T(80,74,'D')+T(80,143,'6')+T(40,98,'4')+T(70,115,'30°',12),
+   'Parallellogram ABCD'),
+ sexhorning: SV('0 0 260 160',
+   PG('70,80 100,28 160,28 190,80 160,132 100,132')+L(70,80,190,80,true)+
+   T(57,84,'A')+T(92,22,'B')+T(168,22,'C')+T(203,84,'D')+T(170,150,'E')+T(90,150,'F')+T(130,20,'2'),
+   'Regelbunden sexhörning'),
+ tangent: SV('0 0 260 170',
+   CI(70,85,45)+L(70,85,97,49)+L(97,49,145,85)+L(70,85,145,85,true)+RA(97,49,-0.6,0.8,0.8,0.6,9)+DOT(70,85)+
+   T(58,102,'O')+T(97,40,'T')+T(155,100,'P')+T(78,62,'3')+T(132,103,'5')+T(130,56,'?'),
+   'Cirkel med tangent från P'),
+ omskriven: SV('0 0 260 180',
+   CI(100,105,65)+PG('40,80 40,130 160,130')+RA(40,130,0,-1,1,0,10)+
+   T(26,74,'A')+T(26,146,'C')+T(172,134,'B')+T(24,108,'5')+T(100,148,'12'),
+   'Rätvinklig triangel med omskriven cirkel'),
+ kvadrat: SV('0 0 260 170',
+   PG('80,30 180,30 180,130 80,130')+CI(130,80,50,'#ffffff')+T(130,152,'2')+T(196,84,'2'),
+   'Kvadrat med inskriven cirkel'),
+ yttervinkel: SV('0 0 260 160',
+   PG('20,130 110.7,22 150,130')+L(150,130,240,130,true)+
+   AR('M48 130 A28 28 0 0 0 38 108.5')+AR('M174 130 A24 24 0 0 0 141.8 107.4')+
+   T(8,134,'A')+T(110,14,'B')+T(146,148,'C')+T(246,126,'D')+T(62,122,'50°',12)+T(104,58,'60°',12)+T(172,112,'?'),
+   'Triangel ABC med förlängd sida'),
+ trapets: SV('0 0 260 160',
+   PG('40,130 200,130 170,70 90,70')+L(90,70,90,130,true)+RA(90,130,0,-1,1,0,9)+
+   T(30,138,'A')+T(210,138,'B')+T(176,62,'C')+T(84,62,'D')+T(120,150,'8')+T(130,60,'4')+T(80,104,'3'),
+   'Parallelltrapets'),
+ likformig: SV('0 0 260 170',
+   PG('130,20 40,150 220,150')+L(100,63.3,160,63.3)+
+   T(130,14,'A')+T(28,162,'B')+T(232,162,'C')+T(88,60,'D')+T(172,60,'E')+T(100,38,'2')+T(54,104,'4')+T(130,82,'3'),
+   'Triangel med parallell linje DE'),
+ sektor: SV('0 0 260 120',
+   `<path d="M60 100 L150 100 A90 90 0 0 0 105 22.1 Z" fill="#eef0ff"/>`+AR('M88 100 A28 28 0 0 0 74 75.8')+
+   T(48,112,'O')+T(162,104,'A')+T(108,16,'B')+T(105,114,'6')+T(106,92,'60°',12),
+   'Cirkelsektor'),
+ hojd: SV('0 0 260 160',
+   PG('40,40 160,130 40,130')+L(40,130,83.2,72.4,true)+RA(40,130,0,-1,1,0,10)+RA(83.2,72.4,-0.6,0.8,0.8,0.6,9)+
+   T(28,36,'A')+T(168,134,'B')+T(28,144,'C')+T(86,64,'H')+T(26,88,'3')+T(100,148,'4')+T(74,110,'h'),
+   'Rätvinklig triangel med höjd mot hypotenusan')
+};
+
+Q.push(
+/* ---------- ALGEBRA ---------- */
+{c:'Algebra', q:r`För alla reella tal $a$ och $b$ gäller att`,
+ o:[r`$|a-b|=|a|-|b|$`, r`$|ab|=|a|\,|b|$`, r`$|a+b|=|a|+|b|$`], a:1,
+ e:r`Absolutbelopp är multiplikativt: $|ab|=|a||b|$. De andra gäller bara för vissa tecken, t.ex. $a=1,\ b=-1$ ger $|a+b|=0\ne2$.`},
+{c:'Algebra', q:r`Om $x>0$ och $x+\dfrac1x=3$, så är $x^2+\dfrac1{x^2}$ lika med`,
+ o:[r`$7$`, r`$9$`, r`$6$`], a:0,
+ e:r`Kvadrera: $\left(x+\frac1x\right)^2=x^2+2+\frac1{x^2}=9$, så $x^2+\frac1{x^2}=7$.`},
+{c:'Algebra', q:r`Talet $(\sqrt8+\sqrt2)^2$ är lika med`,
+ o:[r`$10$`, r`$16$`, r`$20$`], a:-1,
+ e:r`$\sqrt8+\sqrt2=2\sqrt2+\sqrt2=3\sqrt2$, och $(3\sqrt2)^2=18$.`},
+{c:'Algebra', q:r`För alla positiva reella tal $a$ är $a^{1/2}\cdot a^{1/3}$ lika med`,
+ o:[r`$a^{1/6}$`, r`$a^{2/5}$`, r`$a^{5/6}$`], a:2,
+ e:r`Exponenterna adderas: $\frac12+\frac13=\frac56$.`},
+{c:'Algebra', q:r`Om $x<0$ så är $\sqrt{x^2}+x$ lika med`,
+ o:[r`$2x$`, r`$0$`, r`$-2x$`], a:1,
+ e:r`För $x<0$ är $\sqrt{x^2}=|x|=-x$, så summan blir $-x+x=0$.`},
+{c:'Algebra', q:r`Antalet reella lösningar till ekvationen $|x-2|=3x$ är`,
+ o:[r`$0$`, r`$1$`, r`$2$`], a:1,
+ e:r`Fall $x\ge2$: $x-2=3x\Rightarrow x=-1$, vilket inte ligger i fallet. Fall $x<2$: $2-x=3x\Rightarrow x=\frac12$, vilket stämmer. Exakt en lösning.`},
+
+/* ---------- EKVATIONER & OLIKHETER ---------- */
+{c:'Ekvationer & olikheter', q:r`Antalet reella lösningar till $x^4-5x^2+4=0$ är`,
+ o:[r`$2$`, r`$3$`, r`$4$`], a:2,
+ e:r`Sätt $t=x^2$: $t^2-5t+4=0\Rightarrow t=1$ eller $t=4$. Då är $x=\pm1$ eller $x=\pm2$, fyra lösningar.`},
+{c:'Ekvationer & olikheter', q:r`Ekvationen $x^2-4x+k=0$ saknar reella lösningar precis när`,
+ o:[r`$k<4$`, r`$k>4$`, r`$k>16$`], a:1,
+ e:r`Diskriminanten är $16-4k$, och den ska vara negativ: $k>4$.`},
+{c:'Ekvationer & olikheter', q:r`Ekvationen $x^2+px+q=0$ har lösningarna $2$ och $-3$. Då är $p+q$ lika med`,
+ o:[r`$7$`, r`$-7$`, r`$5$`], a:-1,
+ e:r`$p=-(2+(-3))=1$ och $q=2\cdot(-3)=-6$, så $p+q=-5$.`},
+{c:'Ekvationer & olikheter', q:r`Olikheten $(x-1)(x+2)(x-3)<0$ är uppfylld för`,
+ o:[r`$x<-2$ eller $1<x<3$`, r`$-2<x<1$ eller $x>3$`, r`$x<-2$ eller $x>3$`], a:0,
+ e:r`Teckenstudium med nollställena $-2$, $1$ och $3$: produkten är negativ för $x<-2$ och för $1<x<3$, och positiv för $-2<x<1$ och $x>3$.`},
+{c:'Ekvationer & olikheter', q:r`Antalet reella lösningar till $\dfrac{1}{x-1}=\dfrac{x}{x-1}$ är`,
+ o:[r`$0$`, r`$1$`, r`$2$`], a:0,
+ e:r`Multiplicerar man med $x-1$ får man $1=x$, men $x=1$ gör nämnaren noll. Ingen lösning.`},
+{c:'Ekvationer & olikheter', q:r`Ekvationssystemet $x+y=2,\ 2x+2y=a$ saknar lösning`,
+ o:[r`precis när $a=4$`, r`precis när $a\ne4$`, r`för alla $a$`], a:1,
+ e:r`Andra ekvationen säger $x+y=\frac a2$, vilket strider mot $x+y=2$ om $a\ne4$. För $a=4$ är ekvationerna samma, och då finns oändligt många lösningar.`},
+{c:'Ekvationer & olikheter', q:r`Om $x^2-y^2=21$ och $x+y=7$, så är $x$ lika med`,
+ o:[r`$3$`, r`$4$`, r`$7$`], a:-1,
+ e:r`$x^2-y^2=(x-y)(x+y)$, så $x-y=3$. Tillsammans med $x+y=7$ blir $x=5$.`},
+
+/* ---------- LOGARITMER & EXPONENTIAL ---------- */
+{c:'Logaritmer & exponential', q:r`Antalet reella lösningar till $\log_2x+\log_2(x-2)=3$ är`,
+ o:[r`$0$`, r`$1$`, r`$2$`], a:1,
+ e:r`Det ger $x(x-2)=8$, dvs. $x^2-2x-8=0$ och $x=4$ eller $x=-2$. Bara $x=4$ ligger i definitionsmängden ($x>2$).`},
+{c:'Logaritmer & exponential', q:r`För alla positiva reella tal $a$ och $b$ gäller att`,
+ o:[r`$\ln(a+b)=\ln a+\ln b$`, r`$\ln\dfrac ab=\dfrac{\ln a}{\ln b}$`, r`$\ln(a^b)=b\ln a$`], a:2,
+ e:r`Potenslagen för logaritmer. De andra är vanliga förväxlingar av $\ln(ab)=\ln a+\ln b$ och $\ln\frac ab=\ln a-\ln b$.`},
+{c:'Logaritmer & exponential', q:r`Om $\lg2=p$, så är $\lg5$ lika med`,
+ o:[r`$\dfrac1p$`, r`$1-p$`, r`$5p$`], a:1,
+ e:r`$\lg5=\lg\frac{10}{2}=\lg10-\lg2=1-p$.`},
+{c:'Logaritmer & exponential', q:r`Om $\ln x=2$, så är $\ln(x^2e)$ lika med`,
+ o:[r`$4$`, r`$6$`, r`$3$`], a:-1,
+ e:r`$\ln(x^2e)=2\ln x+\ln e=4+1=5$.`},
+{c:'Logaritmer & exponential', q:r`Antalet reella lösningar till $2^x+2^{-x}=2$ är`,
+ o:[r`$0$`, r`$1$`, r`$2$`], a:1,
+ e:r`Sätt $t=2^x>0$: $t+\frac1t=2\Rightarrow(t-1)^2=0\Rightarrow t=1$, dvs. $x=0$. Endast en lösning.`},
+{c:'Logaritmer & exponential', q:r`Om $3^x=7$, så gäller att`,
+ o:[r`$x<1$`, r`$1<x<2$`, r`$2<x<3$`], a:1,
+ e:r`$3^1=3<7<9=3^2$ och $3^x$ är växande, så $1<x<2$.`},
+{c:'Logaritmer & exponential', q:r`För positiva tal $a,b\ne1$ är $\log_a b\cdot\log_b a$ lika med`,
+ o:[r`$0$`, r`$ab$`, r`$a$`], a:-1,
+ e:r`Med basbyte: $\log_a b=\frac{\ln b}{\ln a}$ och $\log_b a=\frac{\ln a}{\ln b}$. Produkten är $1$.`},
+
+/* ---------- KOMPLEXA TAL & POLYNOM ---------- */
+{c:'Komplexa tal & polynom', q:r`Talet $\dfrac{1+i}{1-i}$ är lika med`,
+ o:[r`$1$`, r`$-1$`, r`$-i$`], a:-1,
+ e:r`Förläng med konjugatet: $\dfrac{(1+i)^2}{(1-i)(1+i)}=\dfrac{2i}{2}=i$.`},
+{c:'Komplexa tal & polynom', q:r`Antalet olika reella nollställen till $x^3-x^2-x+1$ är`,
+ o:[r`$1$`, r`$2$`, r`$3$`], a:1,
+ e:r`$x^3-x^2-x+1=x^2(x-1)-(x-1)=(x-1)(x^2-1)=(x-1)^2(x+1)$. Nollställena är $1$ (dubbelt) och $-1$, alltså två olika.`},
+{c:'Komplexa tal & polynom', q:r`Polynomet $x^2+bx+c$ har reella koefficienter och nollstället $1+i$. Då gäller att`,
+ o:[r`$b=2$ och $c=2$`, r`$b=-2$ och $c=2$`, r`$b=-2$ och $c=-2$`], a:1,
+ e:r`Då är även $1-i$ ett nollställe. Summan $2=-b$ och produkten $(1+i)(1-i)=2=c$.`},
+
+/* ---------- TRIGONOMETRI ---------- */
+{c:'Trigonometri', q:r`För alla $x$ (där uttrycken är definierade) gäller att`,
+ o:[r`$\sin(\pi-x)=-\sin x$`, r`$\cos(\pi-x)=\cos x$`, r`$\tan(\pi-x)=-\tan x$`], a:2,
+ e:r`$\sin(\pi-x)=\sin x$ och $\cos(\pi-x)=-\cos x$, så $\tan(\pi-x)=\frac{\sin x}{-\cos x}=-\tan x$.`},
+{c:'Trigonometri', q:r`Om $\tan x=2$ och $\pi<x<\dfrac{3\pi}{2}$, så är $\sin x$ lika med`,
+ o:[r`$\dfrac{2}{\sqrt5}$`, r`$-\dfrac{2}{\sqrt5}$`, r`$-\dfrac1{\sqrt5}$`], a:1,
+ e:r`I tredje kvadranten är både sinus och cosinus negativa. Med $\tan x=2$ blir motstående $2$, närliggande $1$ och hypotenusa $\sqrt5$, så $\sin x=-\frac2{\sqrt5}$.`},
+{c:'Trigonometri', q:r`Antalet lösningar till $\cos2x=\cos x$ i intervallet $[0,2\pi]$ är`,
+ o:[r`$2$`, r`$3$`, r`$4$`], a:2,
+ e:r`$2\cos^2x-1=\cos x\Rightarrow(2\cos x+1)(\cos x-1)=0$. Då är $\cos x=1$ ($x=0$ eller $2\pi$) eller $\cos x=-\frac12$ ($x=\frac{2\pi}3$ eller $\frac{4\pi}3$). Fyra lösningar, eftersom båda ändpunkterna ingår.`},
+{c:'Trigonometri', q:r`För alla reella $x$ är $\sin^2x-\cos^2x$ lika med`,
+ o:[r`$\cos2x$`, r`$-\cos2x$`, r`$\sin2x$`], a:1,
+ e:r`$\cos2x=\cos^2x-\sin^2x$, så $\sin^2x-\cos^2x=-\cos2x$.`},
+{c:'Trigonometri', q:r`Den minsta positiva perioden för $f(x)=\sin x\cos x$ är`,
+ o:[r`$\dfrac\pi2$`, r`$\pi$`, r`$2\pi$`], a:1,
+ e:r`$f(x)=\frac12\sin2x$ har perioden $\frac{2\pi}{2}=\pi$.`},
+{c:'Trigonometri', q:r`Värdemängden för $f(x)=3-2\sin x$ är`,
+ o:[r`$[1,3]$`, r`$[1,5]$`, r`$[-1,5]$`], a:1,
+ e:r`$\sin x$ varierar mellan $-1$ och $1$, så $-2\sin x$ mellan $-2$ och $2$ och $f$ mellan $1$ och $5$.`},
+{c:'Trigonometri', q:r`De spetsiga vinklarna $\alpha$ och $\beta$ i en rätvinklig triangel uppfyller alltid att`,
+ o:[r`$\sin\alpha=\sin\beta$`, r`$\sin\alpha=\cos\beta$`, r`$\tan\alpha=\tan\beta$`], a:1,
+ e:r`Eftersom $\alpha+\beta=90^\circ$ är $\beta=90^\circ-\alpha$, och $\cos(90^\circ-\alpha)=\sin\alpha$.`},
+{c:'Trigonometri', q:r`Om $\tan\alpha=1$ och $\tan\beta=\dfrac12$, så är $\tan(\alpha+\beta)$ lika med`,
+ o:[r`$\dfrac32$`, r`$2$`, r`$\dfrac13$`], a:-1,
+ e:r`$\tan(\alpha+\beta)=\dfrac{1+\frac12}{1-1\cdot\frac12}=\dfrac{3/2}{1/2}=3$.`},
+{c:'Trigonometri', q:r`Antalet lösningar till $\sin x=\cos x$ i intervallet $0<x<\pi$ är`,
+ o:[r`$0$`, r`$1$`, r`$2$`], a:1,
+ e:r`Eftersom $\cos x\ne0$ i lösningarna är det samma som $\tan x=1$. I intervallet finns bara $x=\frac\pi4$.`},
+
+/* ---------- GEOMETRI ---------- */
+{c:'Geometri', f:FIG.parallellogram, q:r`Figuren visar ett parallellogram $ABCD$ med $AB=6$, $AD=4$ och $\angle A=30^\circ$. Arean är`,
+ o:[r`$12$`, r`$12\sqrt3$`, r`$24$`], a:0,
+ e:r`Area $=AB\cdot AD\cdot\sin A=6\cdot4\cdot\frac12=12$. (Höjden är $4\sin30^\circ=2$ och basen $6$.)`},
+{c:'Geometri', f:FIG.sexhorning, q:r`I den regelbundna sexhörningen $ABCDEF$ är sidan $2$. Avståndet mellan hörnen $A$ och $D$ är`,
+ o:[r`$2\sqrt3$`, r`$4$`, r`$6$`], a:1,
+ e:r`En regelbunden sexhörning består av sex liksidiga trianglar med sidan $2$ som möts i centrum. $AD$ går genom centrum och är två sidlängder, alltså $4$. ($2\sqrt3$ är avståndet $AC$.)`},
+{c:'Geometri', f:FIG.tangent, q:r`Från punkten $P$ utanför en cirkel med medelpunkt $O$ och radien $3$ dras en tangent som tangerar cirkeln i $T$. Om $OP=5$ är $PT$ lika med`,
+ o:[r`$4$`, r`$\sqrt{34}$`, r`$2$`], a:0,
+ e:r`Tangenten är vinkelrät mot radien $OT$, så triangeln $OTP$ är rätvinklig och $PT=\sqrt{5^2-3^2}=4$.`},
+{c:'Geometri', f:FIG.omskriven, q:r`Figuren visar en rätvinklig triangel med kateterna $5$ och $12$ och dess omskrivna cirkel. Cirkelns radie är`,
+ o:[r`$6$`, r`$\dfrac{13}{2}$`, r`$13$`], a:1,
+ e:r`Hypotenusan är $\sqrt{5^2+12^2}=13$. Enligt Thales sats är hypotenusan en diameter i den omskrivna cirkeln, så radien är $\frac{13}{2}$.`},
+{c:'Geometri', f:FIG.kvadrat, q:r`Figuren visar en kvadrat med sidan $2$ och cirkeln som precis ryms inuti. Arean av den del av kvadraten som ligger utanför cirkeln är`,
+ o:[r`$4-\dfrac\pi2$`, r`$4-\pi$`, r`$\pi$`], a:1,
+ e:r`Cirkelns radie är $1$ och dess area $\pi$. Kvadratens area är $4$, så resten är $4-\pi$.`},
+{c:'Geometri', f:FIG.yttervinkel, q:r`I triangeln $ABC$ är $\angle A=50^\circ$ och $\angle B=60^\circ$. Sidan $AC$ förlängs förbi $C$ till punkten $D$. Yttervinkeln $\angle BCD$ är`,
+ o:[r`$70^\circ$`, r`$110^\circ$`, r`$130^\circ$`], a:1,
+ e:r`En yttervinkel är lika med summan av de två icke angränsande vinklarna: $50^\circ+60^\circ=110^\circ$. (Eller: $\angle C=70^\circ$ och $180^\circ-70^\circ=110^\circ$.)`},
+{c:'Geometri', f:FIG.trapets, q:r`Figuren visar ett parallelltrapets med de parallella sidorna $8$ och $4$ samt höjden $3$. Arean är`,
+ o:[r`$12$`, r`$18$`, r`$36$`], a:1,
+ e:r`Area $=\dfrac{8+4}{2}\cdot3=18$.`},
+{c:'Geometri', f:FIG.likformig, q:r`I figuren är $DE\parallel BC$, $AD=2$, $DB=4$ och $DE=3$. Då är $BC$ lika med`,
+ o:[r`$6$`, r`$9$`, r`$\dfrac92$`], a:1,
+ e:r`Trianglarna $ADE$ och $ABC$ är likformiga med skalan $\frac{AD}{AB}=\frac26=\frac13$. Alltså är $BC=3\cdot DE=9$.`},
+{c:'Geometri', q:r`Rymddiagonalen i en kub med sidan $1$ har längden`,
+ o:[r`$\sqrt2$`, r`$\sqrt3$`, r`$2$`], a:1,
+ e:r`Ytdiagonalen är $\sqrt2$, och rymddiagonalen blir $\sqrt{(\sqrt2)^2+1^2}=\sqrt3$.`},
+{c:'Geometri', q:r`En triangel har två sidor med längderna $6$ och $8$, och vinkeln mellan dem är $150^\circ$. Triangelns area är`,
+ o:[r`$12$`, r`$12\sqrt3$`, r`$24$`], a:0,
+ e:r`Area $=\frac12\cdot6\cdot8\cdot\sin150^\circ=24\cdot\frac12=12$, eftersom $\sin150^\circ=\sin30^\circ=\frac12$.`},
+{c:'Geometri', f:FIG.sektor, q:r`Figuren visar en cirkelsektor med radien $6$ och vinkeln $60^\circ$. Längden av cirkelbågen $AB$ är`,
+ o:[r`$\pi$`, r`$2\pi$`, r`$6\pi$`], a:1,
+ e:r`Bågen är $\frac{60}{360}=\frac16$ av omkretsen $2\pi\cdot6=12\pi$, alltså $2\pi$. ($6\pi$ är sektorns area.)`},
+{c:'Geometri', q:r`Varje vinkel i en regelbunden femhörning är`,
+ o:[r`$72^\circ$`, r`$108^\circ$`, r`$120^\circ$`], a:1,
+ e:r`Vinkelsumman är $(5-2)\cdot180^\circ=540^\circ$, så varje vinkel är $540^\circ/5=108^\circ$.`},
+{c:'Geometri', f:FIG.hojd, q:r`Figuren visar en rätvinklig triangel med kateterna $3$ och $4$. Höjden $h$ mot hypotenusan är`,
+ o:[r`$2$`, r`$\dfrac52$`, r`$\dfrac{12}{5}$`], a:2,
+ e:r`Hypotenusan är $5$. Arean är $\frac{3\cdot4}{2}=6$ och också $\frac{5h}{2}$. Alltså $5h=12$ och $h=\frac{12}5$.`},
+
+/* ---------- TALFÖLJDER & PROCENT ---------- */
+{c:'Talföljder & procent', q:r`En aritmetisk talföljd har $9$ termer, första termen $5$ och sista termen $25$. Summan av termerna är`,
+ o:[r`$125$`, r`$135$`, r`$150$`], a:1,
+ e:r`Summan är antalet termer gånger medelvärdet av första och sista termen: $9\cdot\frac{5+25}{2}=9\cdot15=135$.`},
+{c:'Talföljder & procent', q:r`En geometrisk serie har första termen $3$ och summan $6$. Kvoten är`,
+ o:[r`$\dfrac12$`, r`$2$`, r`$\dfrac13$`], a:0,
+ e:r`$\dfrac{3}{1-k}=6\Rightarrow1-k=\frac12\Rightarrow k=\frac12$.`},
+{c:'Talföljder & procent', q:r`Den geometriska serien $\sum_{n=0}^{\infty}k^n$ är konvergent precis när`,
+ o:[r`$0<k<1$`, r`$-1<k<1$`, r`$k<1$`], a:1,
+ e:r`En geometrisk serie konvergerar om och endast om $|k|<1$. Negativa $k$ större än $-1$ och $k=0$ fungerar också, medan $k\le-1$ divergerar.`},
+{c:'Talföljder & procent', q:r`Ett pris sänks med $20\,\%$ och höjs därefter med $20\,\%$. Det nya priset är jämfört med ursprungspriset`,
+ o:[r`oförändrat`, r`$4\,\%$ lägre`, r`$4\,\%$ högre`], a:1,
+ e:r`$0{,}8\cdot1{,}2=0{,}96$, alltså $4\,\%$ lägre.`},
+{c:'Talföljder & procent', q:r`En talföljd ges av $a_1=3$ och $a_{n+1}=2a_n-1$. Då är $a_4$ lika med`,
+ o:[r`$15$`, r`$16$`, r`$19$`], a:-1,
+ e:r`$a_2=5,\ a_3=9,\ a_4=17$.`}
+);
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+<script>
+(function(){
+  const app = document.getElementById('app');
+  const LETTERS = ['a','b','c','d'];
+  const NONE = 'Inget av (a)–(c)';
+  const CATS = ['Alla'].concat(Q.map(q=>q.c).filter((c,i,a)=>a.indexOf(c)===i));
+
+  const S = {filter:'Alla', mix:true, queue:[], i:0, score:0, locked:false, missed:[], screen:'start', btns:[], cur:null};
+  const store = {
+    get(k){try{return localStorage.getItem(k)}catch(e){return null}},
+    set(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+  };
+
+  function h(tag, cls, text){
+    const e = document.createElement(tag);
+    if(cls) e.className = cls;
+    if(text !== undefined) e.textContent = text;
+    return e;
+  }
+  function shuffle(a){
+    a = a.slice();
+    for(let i=a.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [a[i],a[j]] = [a[j],a[i]];
+    }
+    return a;
+  }
+  function typeset(el){
+    try{
+      if(window.renderMathInElement){
+        renderMathInElement(el,{
+          delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],
+          throwOnError:false
+        });
+      }
+    }catch(e){}
+  }
+  function pool(){ return S.filter==='Alla' ? Q : Q.filter(q=>q.c===S.filter); }
+  function clear(){ app.textContent=''; window.scrollTo(0,0); }
+
+  /* ---------- Startskärm ---------- */
+  function showStart(){
+    S.screen = 'start';
+    clear();
+    const card = h('div','card');
+    card.appendChild(h('h1',null,'Öva inför matematikprovet'));
+    card.appendChild(h('p','lead','Flervalsfrågor i samma stil som del A: fyra alternativ, ett rätt. Du får svar och förklaring direkt efter varje fråga. Ingen räknare behövs, bara resonemang.'));
+
+    card.appendChild(h('div','label','Område'));
+    const chips = h('div','chips');
+    CATS.forEach(c=>{
+      const n = c==='Alla' ? Q.length : Q.filter(q=>q.c===c).length;
+      const b = h('button','chip'+(S.filter===c?' on':''));
+      b.appendChild(document.createTextNode(c));
+      b.appendChild(h('small',null,String(n)));
+      b.onclick = ()=>{ S.filter=c; showStart(); };
+      chips.appendChild(b);
+    });
+    card.appendChild(chips);
+
+    const tg = h('div','toggle'+(S.mix?' on':''));
+    const t = h('div','t');
+    t.appendChild(h('b',null,'Blanda frågornas ordning'));
+    t.appendChild(h('span',null,'Svarsalternativen slumpas alltid'));
+    tg.appendChild(t);
+    tg.appendChild(h('div','sw'));
+    tg.onclick = ()=>{ S.mix=!S.mix; tg.classList.toggle('on',S.mix); };
+    card.appendChild(tg);
+
+    const go = h('button','btn','Starta · '+pool().length+' uppgifter');
+    go.style.marginTop = '20px';
+    go.onclick = ()=> startRound(pool());
+    card.appendChild(go);
+
+    const best = store.get('best2_'+S.filter);
+    if(best) card.appendChild(h('div','best','Ditt bästa resultat i "'+S.filter+'": '+best));
+    app.appendChild(card);
+  }
+
+  /* ---------- Rond ---------- */
+  function startRound(list){
+    S.queue = S.mix ? shuffle(list) : list.slice();
+    S.i = 0; S.score = 0; S.missed = [];
+    showQuestion();
+  }
+
+  function showQuestion(){
+    S.screen = 'q';
+    S.locked = false;
+    clear();
+    const q = S.queue[S.i];
+    S.cur = q;
+    const total = S.queue.length;
+
+    const top = h('div','topbar');
+    const left = h('div'); left.innerHTML = 'Fråga <b></b> av '+total;
+    left.querySelector('b').textContent = String(S.i+1);
+    const right = h('div','pill','Poäng '+S.score);
+    right.id = 'score';
+    top.appendChild(left); top.appendChild(right);
+    app.appendChild(top);
+
+    const bar = h('div','bar'); const fill = h('i');
+    fill.style.width = (S.i/total*100)+'%';
+    bar.appendChild(fill); app.appendChild(bar);
+    requestAnimationFrame(()=>{ fill.style.width = ((S.i)/total*100)+'%'; });
+
+    const card = h('div','card');
+    card.appendChild(h('span','tag',q.c));
+    card.appendChild(h('p','q'));
+    card.lastChild.innerHTML = q.q.replace(/<u>/g,'<u>');   // tillåter <u> i frågetext (egen data)
+    if(q.f){
+      const fg = h('div','fig');
+      fg.innerHTML = q.f;
+      fg.appendChild(h('small',null,'Figuren är inte nödvändigtvis skalenlig.'));
+      card.appendChild(fg);
+    }
+
+    // a–c slumpas, d ("Inget av (a)–(c)") ligger alltid sist
+    const opts = shuffle(q.o.map((t,idx)=>({t,idx}))).concat([{t:NONE, idx:-1}]);
+    const list = h('div','opts');
+    S.btns = [];
+    opts.forEach((o,k)=>{
+      const b = h('button','opt');
+      b.appendChild(h('span','k',LETTERS[k]));
+      b.appendChild(h('span','txt',o.t));
+      b.appendChild(h('span','mark'));
+      b.onclick = ()=> choose(k);
+      list.appendChild(b);
+      S.btns.push({b,o});
+    });
+    card.appendChild(list);
+
+    const fb = h('div'); fb.id='fb';
+    card.appendChild(fb);
+    app.appendChild(card);
+    typeset(card);
+  }
+
+  function choose(k){
+    if(S.locked) return;
+    S.locked = true;
+    const q = S.cur;
+    const picked = S.btns[k];
+    const ok = picked.o.idx === q.a;
+    const correctK = S.btns.findIndex(x=>x.o.idx===q.a);
+
+    S.btns.forEach((x,i)=>{
+      x.b.disabled = true;
+      if(i===correctK){ x.b.classList.add('good'); x.b.querySelector('.mark').textContent='✓'; }
+      else if(i===k){ x.b.classList.add('bad'); x.b.querySelector('.mark').textContent='✗'; }
+      else x.b.classList.add('dim');
+    });
+
+    if(ok) S.score++; else S.missed.push(q);
+    document.getElementById('score').textContent = 'Poäng '+S.score;
+
+    const fb = document.getElementById('fb');
+    fb.className = 'fb '+(ok?'good':'bad');
+    fb.appendChild(h('h3',null, ok ? 'Rätt!' : 'Inte riktigt – rätt svar är ('+LETTERS[correctK]+')'));
+    fb.appendChild(h('p',null,q.e));
+
+    const last = S.i === S.queue.length-1;
+    const nx = h('button','btn next', last ? 'Se resultat' : 'Nästa fråga');
+    nx.onclick = next;
+    fb.parentNode.appendChild(nx);
+    typeset(fb);
+    setTimeout(()=>{ try{ fb.scrollIntoView({behavior:'smooth',block:'nearest'}); }catch(e){} },60);
+  }
+
+  function next(){
+    if(S.screen!=='q' || !S.locked) return;
+    S.i++;
+    if(S.i >= S.queue.length) showResult(); else showQuestion();
+  }
+
+  /* ---------- Resultat ---------- */
+  function showResult(){
+    S.screen = 'res';
+    clear();
+    const total = S.queue.length;
+    const pct = Math.round(S.score/total*100);
+    const full = S.queue.length === pool().length;
+    if(full){
+      const prev = store.get('best2_'+S.filter);
+      const prevN = prev ? parseInt(prev,10) : -1;
+      if(S.score > prevN) store.set('best2_'+S.filter, S.score+' / '+total);
+    }
+
+    const card = h('div','card center');
+    const ring = h('div','score-ring'); ring.style.setProperty('--p',pct);
+    const inner = h('div');
+    inner.appendChild(h('b',null,S.score+' / '+total));
+    inner.appendChild(h('span',null,pct+' %'));
+    ring.appendChild(inner);
+    card.appendChild(ring);
+
+    const msg = pct===100 ? 'Perfekt! Inga missar.' :
+                pct>=80 ? 'Starkt jobbat!' :
+                pct>=60 ? 'Bra, men några fällor kvar.' :
+                'Fortsätt öva, fällorna går att lära sig.';
+    card.appendChild(h('h1',null,msg));
+    card.appendChild(h('p','lead', S.missed.length ? 'Du missade '+S.missed.length+' uppgifter.' : 'Du svarade rätt på allt.'));
+
+    if(S.missed.length){
+      const again = h('button','btn','Öva på de missade ('+S.missed.length+')');
+      again.onclick = ()=>{ const m=S.missed.slice(); S.queue = shuffle(m); S.i=0; S.score=0; S.missed=[]; showQuestion(); };
+      card.appendChild(again);
+    }
+    const re = h('button','btn'+(S.missed.length?' ghost':''),'Kör igen');
+    re.onclick = ()=> startRound(pool());
+    card.appendChild(re);
+    const home = h('button','btn ghost','Till start');
+    home.onclick = showStart;
+    card.appendChild(home);
+    app.appendChild(card);
+
+    if(S.missed.length){
+      const lab = h('div','label','Missade uppgifter');
+      app.appendChild(lab);
+      S.missed.forEach(q=>{
+        const d = h('details');
+        const s = h('summary');
+        s.innerHTML = q.q;
+        d.appendChild(s);
+        if(q.f){ const fg = h('div','fig'); fg.innerHTML = q.f; d.appendChild(fg); }
+        const correct = q.a===-1 ? NONE : q.o[q.a];
+        const ans = h('div','ans');
+        ans.appendChild(h('b',null,'Rätt svar: '));
+        ans.appendChild(document.createTextNode(correct+'. '+q.e));
+        d.appendChild(ans);
+        app.appendChild(d);
+      });
+      typeset(app);
+    }
+  }
+
+  /* ---------- Tangentbord ---------- */
+  document.addEventListener('keydown',e=>{
+    if(e.ctrlKey||e.metaKey||e.altKey) return;
+    if(S.screen==='q'){
+      const map = {a:0,b:1,c:2,d:3,'1':0,'2':1,'3':2,'4':3};
+      const k = map[e.key.toLowerCase()];
+      if(k!==undefined && !S.locked){ choose(k); return; }
+      if(S.locked && (e.key==='Enter'||e.key===' '||e.key==='ArrowRight')){ e.preventDefault(); next(); }
+    }
+  });
+
+  window.addEventListener('load',()=>{ if(S.screen!=='start') typeset(app); });
+  showStart();
+})();
+</script>
+</body>
+</html>
